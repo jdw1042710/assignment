@@ -59,24 +59,38 @@ class StudentDB{
         string fileDirectory = "file1.txt";
         int option = 1;
 
-        void loadFile(){
+        void loadFile() {
             string line;
             ifstream file(fileDirectory);
-            if (file.is_open()){
-                while (getline(file, line)){
+            if (file.is_open()) {
+                while (getline(file, line)) {
                     Student temp;
                     string token;
                     stringstream sstream(line);
-                    while(getline(sstream, token, '/')){
-                        cout << token;
-                    }
+                    getline(sstream, token, '/');
+                    temp.setName(token);
+                    getline(sstream, token, '/');
+                    temp.setStudentID(token);
+                    getline(sstream, token, '/');
+                    temp.setBirthYear(token);
+                    getline(sstream, token, '/');
+                    temp.setDepartment(token);
+                    getline(sstream, token, '/');
+                    temp.setTelephone(token);
+                    studentList.push_back(temp);
                 }
-                file.close();
             }
+            file.close();
         }
 
-        void saveFile(){
-
+        void saveFile() {
+            ofstream file(fileDirectory);
+            if (file.is_open()) {
+                for (int i = 0; i < studentList.size(); i++) {
+                    file << studentList[i].getName() + "/" + studentList[i].getStudentID() + "/" + studentList[i].getBirthYear() + "/" + studentList[i].getDepartment() + "/" + studentList[i].getTelephone() + '\n';
+                }
+            }
+            file.close();
         }
 
         bool checkName(string name){
@@ -108,7 +122,7 @@ class StudentDB{
             return true;
         }
         bool checkTelephone(string telephone){
-            regex standard("\\d{0, 12}");
+            regex standard("\\d{0,12}");
             if (!regex_match(telephone, standard)){
                 return false;
             }
@@ -117,15 +131,19 @@ class StudentDB{
         void sorting(){
             switch(option){
                 case 1:
+                    cout << "sort by name" << endl;
                     sort(studentList.begin(), studentList.end(), compareName);
                     break;
                 case 2:
+                    cout << "sort by ID" << endl;
                     sort(studentList.begin(), studentList.end(), compareStudentID);
                     break;
                 case 3:
+                    cout << "sort by AdmissionYear" << endl;
                     sort(studentList.begin(), studentList.end(), compareAdmissionYear);
                     break;
                 case 4:
+                    cout << "sort by Dept" << endl;
                     sort(studentList.begin(), studentList.end(), compareDepartment);
                     break;
             }
@@ -134,22 +152,22 @@ class StudentDB{
         static bool compareName(Student a, Student b) {
             string n1 = a.getName();
             string n2 = b.getName();
-		    return n1 > n2;
+		    return n1 < n2;
         }
         static bool compareStudentID(Student a, Student b) {
             string n1 = a.getStudentID();
             string n2 = b.getStudentID();
-		    return n1 > n2;
+		    return n1 < n2;
         }
         static bool compareAdmissionYear(Student a, Student b) {
             string n1 = a.getStudentID().substr(0,4);
             string n2 = b.getStudentID().substr(0,4);
-		    return n1 > n2;
+		    return n1 < n2;
         }
         static bool compareDepartment(Student a, Student b) {
             string n1 = a.getDepartment();
             string n2 = b.getDepartment();
-		    return n1 > n2;
+		    return n1 < n2;
             }
         void searchByName(){
             string keyword;
@@ -189,7 +207,7 @@ class StudentDB{
             for (int i = 0; i < studentList.size(); i++){
                 Student temp = studentList[i];
                 if(keyword == temp.getStudentID().substr(0, 4)){
-                    cout << setw(16) << temp.getName() << setw(11) << temp.getStudentID() << setw(25) << temp.getDepartment() << setw(11) << temp.getBirthYear() << setw(12) << temp.getTelephone() << endl;
+                    cout << setw(15) << temp.getName() << setw(11) << temp.getStudentID() << setw(25) << temp.getDepartment() << setw(11) << temp.getBirthYear() << setw(12) << temp.getTelephone() << endl;
                 }
             }
         }
@@ -217,7 +235,9 @@ class StudentDB{
             }
         }
     public:
-        StudentDB(){}
+        StudentDB(){
+            loadFile();
+        }
         void insertion(){
             Student temp;
             string answer;
@@ -226,8 +246,8 @@ class StudentDB{
             cin >> answer;
             if(!checkName(answer)){
                 cout << "'Name' has up to 15 (English) characters" << endl;
-                cout << "Return to menu (Press Enter..)";
-                cin >> answer;
+                cout << "Exit the input that was in progress and return to the menu." << endl;
+                system("pause");
                 return;
             }
             temp.setName(answer);
@@ -235,9 +255,8 @@ class StudentDB{
             cout << "Student ID (10 digits)? ";
             cin >> answer;
             if(!checkStudentID(answer)){
-                cout << "'Student ID' should be exactly 10 digits where first 4 digits represent admission year" << endl;
-                cout << "Return to menu (Press Enter..)";
-                cin >> answer;
+                cout << "Incorrect input (Please check the specifications or ID already existed)" << endl;
+                cout << "Exit the input that was in progress and return to the menu." << endl;
                 return;
             }
             temp.setStudentID(answer);
@@ -245,29 +264,26 @@ class StudentDB{
             cout << "Birth Year (4 digits)? ";
             cin >> answer;
             if(!checkBirthYear(answer)){
-                cout << "'Birth Year' should be exactly 4 digits." << endl;
-                cout << "Return to menu (Press Enter..)";
-                cin >> answer;
+                cout << "Incorrect input (Please check the specifications)" << endl;
+                cout << "Exit the input that was in progress and return to the menu." << endl;
                 return;
             }
             temp.setBirthYear(answer);
 
-            cout << "Department? ";
+            cout << "Department?(if you want to use blank, please use underscore ('_') instead of blank)";
             cin >> answer;
             temp.setDepartment(answer);
 
             cout << "Tel? ";
             cin >> answer;
             if(!checkTelephone(answer)){
-                cout << "'Tel' has up to 12 digits." << endl;
-                cout << "Return to menu (Press Enter..)";
-                cin >> answer;
+                cout << "Incorrect input (Please check the specifications)" << endl;
+                cout << "Exit the input that was in progress and return to the menu." << endl;
                 return;
             }     
             temp.setTelephone(answer);
             studentList.push_back(temp);
-            cout << "Successfully inserted! (Press Enter..)";
-            cin >> answer; 
+            cout << "Successfully inserted!" << endl;
         }
         void search(){           
             sorting();
