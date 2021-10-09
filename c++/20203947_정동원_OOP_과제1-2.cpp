@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <algorithm>
 #include <vector>
@@ -58,7 +60,19 @@ class StudentDB{
         int option = 1;
 
         void loadFile(){
-
+            string line;
+            ifstream file(fileDirectory);
+            if (file.is_open()){
+                while (getline(file, line)){
+                    Student temp;
+                    string token;
+                    stringstream sstream(line);
+                    while(getline(sstream, token, '/')){
+                        cout << token;
+                    }
+                }
+                file.close();
+            }
         }
 
         void saveFile(){
@@ -353,7 +367,5 @@ class Menu{
 
 
 int main(void){
-    Student p1;
-    string str = "9999999999";
     Menu menu;
 }
